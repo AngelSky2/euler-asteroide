@@ -1,7 +1,7 @@
 import { terminal, exactV, exactDrop, euler, validate } from "./fall.js";
 import { lineChart } from "./charts.js";
 
-const STUDENT = { nombre: "Angel (completar apellidos)", materia: "Métodos Numéricos", repo: "https://github.com/AngelSky2/euler-asteroide" };
+const STUDENT = { nombre: "Alejandro Angel Cruz Chacón", materia: "Métodos Numéricos", repo: "https://github.com/AngelSky2/euler-asteroide" };
 const $ = (s) => document.querySelector(s);
 const ids = ["m", "k", "g", "v0", "T", "h", "h2"];
 const fmt = (v, p = 6) => (v === null || !Number.isFinite(v) ? "—" : v === 0 ? "0" : Math.abs(v) < 1e-4 ? v.toExponential(2) : (+v.toPrecision(p)).toString());
