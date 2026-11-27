@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vuelo oscuro: la caída de un fragmento de asteroide · Método de Euler</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">☄️ Vuelo oscuro</div>
+  <nav>
+    <a href="#contexto">Contexto</a><a href="#modelo">Modelo</a><a href="#analitica">Solución analítica</a>
+    <a href="#euler">Euler a mano</a><a href="#simulador">Simulador</a><a href="#explicacion">Explicación</a>
+  </nav>
+</header>
+<main>
+<section class="hero">
+  <p class="eyebrow">Métodos Numéricos · Ejercicio 42 · Método de Euler y solución analítica</p>
+  <h1>¿A qué velocidad llega al suelo un fragmento de asteroide? Caída con resistencia del aire resuelta por Euler</h1>
+  <div class="formula">m · dv/dt = −m·g + k·v² ,&nbsp;&nbsp; m = 5 kg, k = 0,05 kg/m, g = 9,81 m/s², v(0) = 0, 0 ≤ t ≤ 15 s</div>
+  <div class="kpis" id="heroKpis"></div>
+  <p class="muted" id="studentLine"></p>
+</section>
+
+<section id="contexto">
+  <h2><span class="num">1</span> Contexto: un asteroide cae el próximo año</h2>
+  <div class="grid2">
+    <div>
+      <p><b>Escenario hipotético, 2027:</b> un asteroide pequeño, de 1 a 2 m, entra en la atmósfera sobre el altiplano boliviano a unos 17 km/s. La fricción con el aire lo calienta hasta volverlo una <b>bola de fuego</b> y lo rompe en fragmentos a 20–40 km de altura.</p>
+      <p>Cuando un fragmento pierde casi toda su velocidad cósmica deja de brillar y entra en el <b>“vuelo oscuro”</b> (<i>dark flight</i>): cae como cualquier piedra, frenada por el aire. En esa etapa final sirve exactamente la ecuación del ejercicio:</p>
+      <div class="formula sm">m dv/dt = <span style="color:var(--bad)">−mg</span> (peso, hacia abajo) + <span style="color:var(--good)">kv²</span> (arrastre del aire, hacia arriba)</div>
+      <p>Este cálculo lo hacen los equipos que buscan meteoritos. Saber la <b>velocidad de impacto</b> y el <b>tiempo de caída</b> permite estimar el daño, cuánto deriva el fragmento con el viento y dónde buscarlo.</p>
+      <p><b>Antecedente real cercano:</b> el 15 de septiembre de 2007 cayó un meteorito condrítico en <b>Carancas (Puno, Perú)</b>, a pocos kilómetros de la frontera con Bolivia, y abrió un cráter de unos 13 m. La caída de asteroides es un tema de defensa planetaria que la NASA y la ESA vigilan de forma permanente. En 2025, por ejemplo, el asteroide 2024 YR4 llamó la atención hasta que se descartó su impacto con la Tierra.</p>
+    </div>
+    <div>
+      <div class="warn-box"><b>Aclaración.</b> La caída de 2027 es un <b>escenario hipotético</b> para dar contexto al ejercicio. No existe una predicción de impacto. Los parámetros (m = 5 kg, k = 0,05 kg/m) son los del enunciado.</div>
+      <h3>¿Qué significa cada término?</h3>
+      <table class="tbl left">
+        <thead><tr><th>Símbolo</th><th>Significado</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>v(t)</td><td>velocidad vertical (positiva hacia arriba; negativa al caer)</td><td>m/s</td></tr>
+          <tr><td>m</td><td>masa del fragmento</td><td>5 kg</td></tr>
+          <tr><td>g</td><td>aceleración de la gravedad</td><td>9,81 m/s²</td></tr>
+          <tr><td>k</td><td>coeficiente de arrastre, k = ½ ρ C<sub>d</sub> A</td><td>0,05 kg/m</td></tr>
+          <tr><td>v(0)</td><td>inicio del vuelo oscuro (idealización del ejercicio)</td><td>0 m/s</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Con ρ ≈ 1 kg/m³ y C<sub>d</sub> ≈ 1, k = 0,05 equivale a un área frontal de ≈ 0,1 m²: un fragmento irregular o poroso. Una roca compacta de 5 kg tiene un área menor, k ≈ 0,01, y cae más rápido (≈ 70 m/s). Pruébelo en el simulador.</p>
+    </div>
+  </div>
+</section>
+
+<section id="modelo">
+  <h2><span class="num">2</span> Modelo y velocidad terminal</h2>
+  <div class="grid2">
+    <div>
+      <p>Dividiendo entre m:</p>
+      <div class="formula">dv/dt = −g + (k/m)·v² = f(t, v)</div>
+      <p>Al principio v = 0 y el fragmento acelera con g. A medida que cae más rápido crece el arrastre kv², hasta que <b>equilibra el peso</b>. Entonces dv/dt = 0:</p>
+      <div class="formula">m g = k v<sub>T</sub>² &nbsp;⇒&nbsp; v<sub>T</sub> = √(m g / k) = √(5·9,81/0,05) = √981 ≈ <b>31,32 m/s</b> (≈ 113 km/h)</div>
+    </div>
+    <div>
+      <h3>Supuestos</h3>
+      <ul>
+        <li>Movimiento solo vertical, sin viento ni componente horizontal.</li>
+        <li>k constante: densidad del aire constante y fragmento que ya no pierde masa por ablación.</li>
+        <li>g constante, porque la altura es pequeña frente al radio terrestre.</li>
+        <li>El arrastre es cuadrático (kv²), lo que corresponde a un número de Reynolds alto.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="analitica">
+  <h2><span class="num">3</span> Solución analítica</h2>
+  <div class="grid2">
+    <div>
+<pre>dv/dt = −g (1 − v²/v_T²)          (porque k/m = g/v_T²)
+
+Separando variables:
+  dv / (1 − v²/v_T²) = −g dt
+
+  ∫ dv / (1 − v²/v_T²) = v_T · artanh(v / v_T)
+
+  v_T · artanh(v / v_T) = −g t + C ,  v(0) = 0 ⇒ C = 0
+
+  <b>v(t) = −v_T · tanh(g t / v_T)</b>
+       = −31,32 · tanh(0,3132 t)   [m/s]</pre>
+      <p>Distancia recorrida: <b>d(t) = (v<sub>T</sub>²/g)·ln cosh(g t / v<sub>T</sub>)</b> = 100·ln cosh(0,3132 t) m. En 15 s el fragmento cae ≈ <b>400 m</b>.</p>
+    </div>
+    <div>
+      <h3>Verificación por sustitución</h3>
+<pre>v = −v_T tanh(u),  u = g t / v_T
+
+dv/dt = −v_T · sech²(u) · g/v_T = −g sech²(u)
+
+−g + (k/m) v² = −g + (g/v_T²) v_T² tanh²(u)
+             = −g (1 − tanh²(u)) = −g sech²(u)   ✔
+
+v(0) = −v_T tanh(0) = 0                          ✔
+t → ∞:  tanh → 1  ⇒  v → −v_T                    ✔</pre>
+      <p>Con v(0) = v₀ &lt; 0 (fragmento que ya viene cayendo) la solución general es v = −v<sub>T</sub> tanh(gt/v<sub>T</sub> + c) si |v₀| &lt; v<sub>T</sub>, o v = −v<sub>T</sub> coth(gt/v<sub>T</sub> + c) si |v₀| &gt; v<sub>T</sub>. En el segundo caso el fragmento <b>frena</b> hasta v<sub>T</sub>, que es lo que ocurre en el vuelo oscuro real.</p>
+    </div>
+  </div>
+</section>
+
+<section id="euler">
+  <h2><span class="num">4</span> Método de Euler: primeros pasos a mano (h = 1 s)</h2>
+  <div class="grid2">
+    <div>
+      <div class="formula">v<sub>n+1</sub> = v<sub>n</sub> + h · f(t<sub>n</sub>, v<sub>n</sub>) = v<sub>n</sub> + h·(−g + (k/m) v<sub>n</sub>²)</div>
+      <p>k/m = 0,05/5 = 0,01 m⁻¹.</p>
+<pre>n=0: v₀ = 0
+     v₁ = 0 + 1·(−9,81 + 0,01·0²)        = −9,810000 m/s
+n=1: v₂ = −9,81 + 1·(−9,81 + 0,01·96,2361) = −18,657639 m/s
+n=2: v₃ = −18,657639 + (−9,81 + 0,01·348,1075)
+        = −24,986564 m/s
+n=3: v₄ = −24,986564 + (−9,81 + 0,01·624,3284)
+        = −28,553280 m/s</pre>
+    </div>
+    <div>
+      <p>Exactas: v(1) = −9,5013, v(2) = −17,4013, v(3) = −23,0225, v(4) = −26,5939 m/s.</p>
+      <p><b>¿Por qué Euler sobreestima la rapidez?</b> Euler usa la pendiente del <i>inicio</i> de cada intervalo. Al principio el arrastre es casi nulo, así que la pendiente inicial (−g) es más empinada que la real, que se va suavizando. El error máximo con h = 1 es ≈ 1,96 m/s (8,5 %) en t ≈ 3 s. Después la curva se aplana cerca de v<sub>T</sub> y el error se reduce casi a cero, porque las dos soluciones tienden al mismo equilibrio.</p>
+      <p>Euler es de <b>orden 1</b>: al dividir h entre 2 el error se reduce aproximadamente a la mitad (véase la tabla de comparación).</p>
+      <p><a href="python/euler_asteroide.py">Script en Python</a> con las tablas para h = 1, 0,5 y 0,1 s y la gráfica: <a href="img/velocidad_euler.png">img/velocidad_euler.png</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="simulador">
+  <h2><span class="num">5</span> Simulador interactivo</h2>
+  <div class="btnrow">
+    <button class="primary" data-preset="ej">Ejercicio 42 (k = 0,05)</button>
+    <button data-preset="roca">Roca compacta (k = 0,01)</button>
+    <button data-preset="rapido">Viene a 150 m/s (vuelo oscuro real)</button>
+  </div>
+  <div class="controls">
+    <label>m · masa <input id="m" type="number" value="5" step="0.5"><span class="unit">kg</span></label>
+    <label>k · arrastre <input id="k" type="number" value="0.05" step="0.005"><span class="unit">kg/m</span></label>
+    <label>g · gravedad <input id="g" type="number" value="9.81" step="0.01"><span class="unit">m/s²</span></label>
+    <label>v₀ · velocidad inicial <input id="v0" type="number" value="0" step="1" max="0"><span class="unit">m/s (≤ 0)</span></label>
+    <label>T · tiempo final <input id="T" type="number" value="15" step="1"><span class="unit">s</span></label>
+    <label>h · paso de Euler <input id="h" type="number" value="1" step="0.1"><span class="unit">s</span></label>
+    <label>h₂ · paso de comparación <input id="h2" type="number" value="0.1" step="0.05"><span class="unit">s</span></label>
+  </div>
+  <div id="valBox" class="alert"></div>
+  <div class="kpis" id="kpis"></div>
+  <h3>v(t): analítica vs Euler</h3>
+  <div id="chartV"></div>
+  <div class="grid2">
+    <div><h3>Error absoluto (escala log)</h3><div id="chartE"></div></div>
+    <div><h3>Comparación de pasos</h3><div id="cmp"></div></div>
+  </div>
+  <h3>Tabla de iteraciones (h)</h3>
+  <div class="scroll" id="table"></div>
+</section>
+
+<section id="explicacion">
+  <h2><span class="num">6</span> Explicación de los resultados</h2>
+  <div class="grid2">
+    <div>
+      <div class="answer"><h4>Solución analítica</h4>v(t) = −31,32·tanh(0,3132·t) m/s. La velocidad crece rápido al principio y se estabiliza en la <b>velocidad terminal de 31,32 m/s</b>. A los 15 s el fragmento va a −31,316 m/s, el 99,99 % de v<sub>T</sub>.</div>
+      <div class="answer"><h4>Euler</h4>Con h = 1 s Euler reproduce la forma de la curva, pero en los primeros segundos sobreestima la rapidez (error máximo ≈ 2 m/s). Con h = 0,1 s el error máximo baja a ≈ 0,18 m/s, menos del 1 %. Para t ≥ 10 s ambas soluciones prácticamente coinciden, porque la velocidad es casi constante.</div>
+    </div>
+    <div>
+      <div class="answer"><h4>Interpretación en el contexto del asteroide</h4>
+        <ul>
+          <li>Pasados unos 10 s de vuelo oscuro, el fragmento cae a <b>velocidad constante ≈ 113 km/h</b> sin importar cuánto más caiga. La atmósfera hace de “paracaídas”.</li>
+          <li>Esa velocidad equivale a dejar caer 5 kg desde unos 50 m de altura (energía ½mv² ≈ 2,45 kJ). Puede romper un techo de calamina o lesionar a una persona, pero <b>no forma un cráter</b>. Los cráteres como el de Carancas los forman objetos de varias toneladas que no alcanzan a frenarse.</li>
+          <li>Aunque el fragmento llegue a 150 m/s, el arrastre lo frena hasta v<sub>T</sub> en pocos segundos (botón “Viene a 150 m/s”).</li>
+          <li>Con un paso de Euler demasiado grande, la velocidad estimada en los primeros segundos resulta mayor que la real y el tiempo de caída menor. Para predecir dónde cae un meteorito se usa un h pequeño o métodos de mayor orden (RK4).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="muted">Este ejercicio continúa en el desafío <b>“Euler en el espacio”</b>: la misma física (gravedad + arrastre) aplicada a la reentrada de la cápsula Friendship 7, como en la película <i>Talentos ocultos</i>.</p>
+</section>
+</main>
+<footer id="footer"></footer>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
